@@ -3,7 +3,6 @@ import os
 import shutil
 import subprocess
 import urllib
-import zipfile
 import tarfile
 import time
 
@@ -39,6 +38,18 @@ class Predictor(BasePredictor):
 
         print("Made zip in {:.2f}s".format(time.time() - start))
 
+    def tar_dir(self, weights_dir, out_file):
+        start = time.time()
+        directory = Path(weights_dir)
+        with tarfile.open(out_file, "w") as tar:
+            for file_path in directory.rglob("*"):
+                if file_path.is_dir():
+                    continue
+                print(file_path)
+                tar.add(file_path, arcname=file_path.relative_to(directory))
+
+        print("Made tar in {:.2f}s".format(time.time() - start))
+
 
     def predict(
         self,
@@ -52,10 +63,10 @@ class Predictor(BasePredictor):
 
         self.download_repo(repo_id, revision, weights_dir)
 
-        out_file = "weights.zip"
+        out_file = "weights.tar"
         if os.path.exists(out_file):
             os.remove(out_file)
 
-        self.zip_dir(weights_dir, out_file)
+        self.tar_dir(weights_dir, out_file)
 
         return Path(out_file)
