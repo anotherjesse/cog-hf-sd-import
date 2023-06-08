@@ -23,21 +23,6 @@ class Predictor(BasePredictor):
         pipe.save_pretrained(dest)
 
 
-    def zip_dir(self, weights_dir, out_file):
-        start = time.time()
-        with zipfile.ZipFile(out_file, "w") as zip:
-            directory = Path(weights_dir)
-            print("adding to zip:")
-            for file_path in directory.rglob("*"):
-                if file_path.is_file():
-                    print(file_path)
-                    zip.write(
-                        file_path,
-                        arcname=file_path.relative_to(weights_dir)
-                    )
-
-        print("Made zip in {:.2f}s".format(time.time() - start))
-
     def tar_dir(self, weights_dir, out_file):
         start = time.time()
         directory = Path(weights_dir)
